@@ -1,0 +1,10 @@
+name: "CI/CD Pipeline"
+
+on:
+  push:
+    paths:
+      - "terraform/**"
+      - ".github/workflows/**"
+    branches:
+      - main
+  pull_request:
