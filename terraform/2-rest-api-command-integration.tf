@@ -1,7 +1,7 @@
-# REST API Integration -> (POST/PUT/PATCH/DELETE) /urls requests -> `command` Lambda Function
+# REST API Integration -> (POST/PUT/PATCH/DELETE) /patch-urls requests -> `command` Lambda Function
 
 resource "aws_api_gateway_resource" "command_resource" {
-  path_part   = "urls"
+  path_part   = "patch-urls"
   parent_id   = aws_api_gateway_rest_api.main.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.main.id
 }

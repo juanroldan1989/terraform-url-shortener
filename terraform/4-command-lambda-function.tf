@@ -1,5 +1,5 @@
 resource "aws_iam_role" "command_lambda_exec" {
-  name = "command_lambda_role"
+  name = "command-lambda-role"
 
   assume_role_policy = <<POLICY
 {
@@ -23,7 +23,7 @@ resource "aws_iam_role_policy_attachment" "command_lambda_policy" {
 }
 
 resource "aws_iam_policy" "command_lambda_function_table_access" {
-  name = "DynamoDBTableAccess"
+  name = "DynamoDBTableUrlsAccess"
 
   policy = jsonencode({
     Version = "2012-10-17"

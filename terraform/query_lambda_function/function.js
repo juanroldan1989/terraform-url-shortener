@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-1' });
 
-exports.handler = (event, context) => {
+exports.handler = async (event, context) => {
   console.log('Received event:', JSON.stringify(event, null, 2));
   console.log('CasePath:', `${event.httpMethod} ${event.resource}`);
 
@@ -23,7 +23,7 @@ exports.handler = (event, context) => {
   try {
     switch (casePath) {
       case "GET /urls":
-        data = documentClient.scan(params).promise();
+        data = await documentClient.scan(params).promise();
         responseBody = JSON.stringify(data.Items);
         statusCode = 200;
         break;
@@ -32,7 +32,7 @@ exports.handler = (event, context) => {
 
       default:
         throw new Error(`Unsupported route: "${casePath}"`);
-      }
+    }
   } catch (err) {
     statusCode = 400;
     responseBody = err.message;
