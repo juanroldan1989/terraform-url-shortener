@@ -1,2 +1,8 @@
 .DS_Store
+
 terraform/.terraform
+terraform/command_lambda_function/node_modules
+terraform/query_lambda_function/node_modules
+
+command_lambda_function.zip
+query_lambda_function.zip

@@ -8,3 +8,28 @@ on:
     branches:
       - main
   pull_request:
+
+jobs:
+  linting:
+    name: "Lambda Functions - Linting"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: "[Command Lambda Function] Install Dependencies & Run Linters"
+        working-directory: terraform/command_lambda_function
+        run: |
+          npm ci
+          npx eslint function.js
+
+      - name: "[Query Lambda Function] Install Dependencies & Run Linters"
+        working-directory: terraform/query_lambda_function
+        run: |
+          npm ci
+          npx eslint function.js
