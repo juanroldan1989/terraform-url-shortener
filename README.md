@@ -9,9 +9,9 @@
 
 ## Features
 
-- Ability to submit URL `https://really-awesome-long-url.com` to API.
+- Ability to submit URL `https://really-awesome-long-url.com` to API (POST request).
 - Receive short URL `https://short.com` in return.
-- Short URL can then be shared around and should redirect to original URL.
+- Short URL can then be used and should redirect to original URL (GET request).
 
 ## API Docs page
 
@@ -70,9 +70,20 @@ Technically, this can be implemented in HTTP so that the `Command API` is implem
 
 ## Further Improvements
 
+- `GET /urls/{url}` path parameter can be sent as `GET /urls?url={url}` query parameter instead. Adjust `aws_api_gateway_integration` terraform resource:
+
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration
+
+https://aws.amazon.com/premiumsupport/knowledge-center/pass-api-gateway-rest-api-parameters/
+
+https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#input-variable-reference
+
 - URLs shortened can be `temporal` or `permanent` ones.
+
 - `permanent` URLs need payment by authenticated users first.
+
 - `temporal` URLs only last 24hs and can be created through a public endpoint.
+
 - Task in background should remove `temporal` URLs from database after 24hs.
 
 # URL Shortener Frontend

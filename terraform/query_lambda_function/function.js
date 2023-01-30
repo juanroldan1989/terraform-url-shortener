@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
   const documentClient = new AWS.DynamoDB.DocumentClient();
   const ddb = new AWS.DynamoDB();
 
-  let casePath = `${event.httpMethod} ${event.resource}`; // GET /urls
+  let casePath = `${event.httpMethod} ${event.resource}`; // GET /urls/{url+}
 
   let responseBody;
   let statusCode = 200;
@@ -23,10 +23,14 @@ exports.handler = async (event, context) => {
   try {
     switch (casePath) {
       case "GET /urls/{url+}":
-        const originalUrl = console.log("event.pathParameters.url: ", event.pathParameters.url);
+        console.log("event.pathParameters.url: ", event.pathParameters.url);
 
-        data = await documentClient.scan(params).promise();
-        responseBody = JSON.stringify(data.Items);
+        params['Key'] = { 'ShortUrl' : { S: event.pathParameters.url } };
+        params['ProjectionExpression'] = 'Id, OriginalUrl, ShortUrl';
+
+        data = await ddb.getItem(params).promise();
+
+        responseBody = JSON.stringify(data.Item);
         statusCode = 200;
         break;
 
