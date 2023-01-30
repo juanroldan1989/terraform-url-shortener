@@ -1,4 +1,4 @@
-# REST API Integration -> GET /urls/{url+} requests -> `query` Lambda Function
+# REST API Integration -> GET /urls/{code+} requests -> `query` Lambda Function
 
 resource "aws_api_gateway_resource" "query_resource" {
   path_part   = "urls"
@@ -7,7 +7,7 @@ resource "aws_api_gateway_resource" "query_resource" {
 }
 
 resource "aws_api_gateway_resource" "query_resource_id" {
-  path_part   = "{url+}"
+  path_part   = "{code+}"
   parent_id   = aws_api_gateway_resource.query_resource.id
   rest_api_id = aws_api_gateway_rest_api.main.id
 }

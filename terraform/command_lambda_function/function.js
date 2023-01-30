@@ -5,10 +5,8 @@ exports.handler = async (event, context) => {
   console.log('Received event:', JSON.stringify(event, null, 2));
   console.log('CasePath:', `${event.httpMethod} ${event.resource}`);
 
-  const documentClient = new AWS.DynamoDB.DocumentClient();
   const ddb = new AWS.DynamoDB();
-
-  let casePath = `${event.httpMethod} ${event.resource}`; // POST /submit-urls
+  const casePath = `${event.httpMethod} ${event.resource}`; // POST /urls
 
   let responseBody;
   let statusCode = 200;
@@ -23,11 +21,23 @@ exports.handler = async (event, context) => {
   try {
     switch (casePath) {
       case "POST /urls":
-        responseBody = "responseBody"
+        requestJSON = JSON.parse(event.body);
+        const originalUrl = requestJSON.url;
+
+        if (!originalUrl) {
+          throw new Error('`url` parameter is required');
+        }
+
+        let hashCode = await generateHashCode(originalUrl);
+        let hashCodeString = hashCode.toString();
+
+        params['Item'] = { 'Id' : { S : hashCodeString } };
+        params['Item']['OriginalUrl'] = { S : originalUrl };
+
+        data = await ddb.putItem(params).promise();
+        responseBody = hashCodeString;
         statusCode = 200;
         break;
-
-      // more cases ...
 
       default:
         throw new Error(`Unsupported route: "${casePath}"`);
@@ -45,3 +55,10 @@ exports.handler = async (event, context) => {
 
   return response;
 }
+
+function generateHashCode(url) {
+  return url.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+};

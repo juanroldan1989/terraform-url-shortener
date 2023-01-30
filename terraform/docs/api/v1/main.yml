@@ -12,12 +12,12 @@ schemes:
   - https
 
 paths:
-  /urls/{url}:
+  /urls/{code}:
     get:
       summary: Returns original URL
       parameters:
         - in: path
-          name: url
+          name: code
           schema:
             type: string
           required: true
