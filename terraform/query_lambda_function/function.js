@@ -22,7 +22,9 @@ exports.handler = async (event, context) => {
 
   try {
     switch (casePath) {
-      case "GET /urls":
+      case "GET /urls/{url+}":
+        const originalUrl = console.log("event.pathParameters.url: ", event.pathParameters.url);
+
         data = await documentClient.scan(params).promise();
         responseBody = JSON.stringify(data.Items);
         statusCode = 200;
