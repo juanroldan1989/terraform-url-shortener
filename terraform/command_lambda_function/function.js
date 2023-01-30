@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
 
   try {
     switch (casePath) {
-      case "POST /patch-urls":
+      case "POST /urls":
         responseBody = "responseBody"
         statusCode = 200;
         break;
