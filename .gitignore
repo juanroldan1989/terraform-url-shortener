@@ -1,6 +1,8 @@
 .DS_Store
 
 terraform/.terraform
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
 terraform/command_lambda_function/node_modules
 terraform/query_lambda_function/node_modules
 
