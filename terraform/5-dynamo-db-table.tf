@@ -18,7 +18,7 @@ resource "aws_dynamodb_table_item" "url_1" {
   item = <<ITEM
     {
       "Id": {"N": "1"},
-      "LongUrl": {"S": "https://super-really-long-url-1.com"},
+      "Url": {"S": "https://super-really-long-url-1.com"},
       "ShortUrl": {"S": "https://short-1.com"}
     }
     ITEM
@@ -31,7 +31,7 @@ resource "aws_dynamodb_table_item" "url_2" {
   item = <<ITEM
     {
       "Id": {"N": "2"},
-      "LongUrl": {"S": "https://super-really-long-url-2.com"},
+      "Url": {"S": "https://super-really-long-url-2.com"},
       "ShortUrl": {"S": "https://short-2.com"}
     }
     ITEM
@@ -44,7 +44,7 @@ resource "aws_dynamodb_table_item" "url_3" {
   item = <<ITEM
     {
       "Id": {"N": "3"},
-      "LongUrl": {"S": "https://super-really-long-url-3.com"},
+      "Url": {"S": "https://super-really-long-url-3.com"},
       "ShortUrl": {"S": "https://short-3.com"}
     }
     ITEM

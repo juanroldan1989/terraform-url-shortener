@@ -1,17 +1,19 @@
 # URL Shortener
 
 1. Features
-2. CQRS Pattern
-3. API Docs
+2. API Docs
+3. CQRS Pattern
 4. API Testing
 5. API Development Life Cycle
 6. Further Improvements
 
 ## Features
 
-- Ability to submit long URL `https://really-awesome-long-url.com` to API.
+- Ability to submit URL `https://really-awesome-long-url.com` to API.
 - Receive short URL `https://short.com` in return.
-- Short URL can then be shared around and should redirect to long URL.
+- Short URL can then be shared around and should redirect to original URL.
+
+## API Docs
 
 ## CQRS Pattern
 
@@ -24,8 +26,6 @@ CQRS stands for `Command and Query Responsibility Segregation`, a pattern that s
 `query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services, each with its own storage.
 
 Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes` (The write side uses a schema that is optimized for updates), while the `Query API` is implemented exclusively with `GET routes` (The read side can use a schema that is optimized for queries)
-
-## API Docs
 
 ## API Testing
 
