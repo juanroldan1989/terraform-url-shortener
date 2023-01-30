@@ -5,7 +5,6 @@ exports.handler = async (event, context) => {
   console.log('Received event:', JSON.stringify(event, null, 2));
   console.log('CasePath:', `${event.httpMethod} ${event.resource}`);
 
-  const documentClient = new AWS.DynamoDB.DocumentClient();
   const ddb = new AWS.DynamoDB();
 
   let casePath = `${event.httpMethod} ${event.resource}`; // GET /urls/{url+}
@@ -30,11 +29,9 @@ exports.handler = async (event, context) => {
 
         data = await ddb.getItem(params).promise();
 
-        responseBody = JSON.stringify(data.Item);
-        statusCode = 200;
+        responseBody = data.Item.OriginalUrl.S;
+        statusCode = 301; // HTTP Code - Moved Permanently
         break;
-
-      // more cases ...
 
       default:
         throw new Error(`Unsupported route: "${casePath}"`);

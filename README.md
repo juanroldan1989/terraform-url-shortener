@@ -3,9 +3,10 @@
 1. Features
 2. API Docs
 3. CQRS Pattern
-4. API Testing
-5. API Development Life Cycle
-6. Further Improvements
+4. HTTP Redirections
+5. API Testing
+6. API Development Life Cycle
+7. Further Improvements
 
 ## Features
 
@@ -63,6 +64,10 @@ CQRS stands for `Command and Query Responsibility Segregation`, a pattern that s
 `query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services, each with its own storage.
 
 Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes` (The write side uses a schema that is optimized for updates), while the `Query API` is implemented exclusively with `GET routes` (The read side can use a schema that is optimized for queries)
+
+## HTTP Redirections
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirections
 
 ## API Testing
 
