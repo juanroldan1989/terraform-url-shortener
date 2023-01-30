@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "URL Shortener API",
-    "description": "Submit URLs and get shortened URLs in return",
+    "description": "Submit URLs and get unique code",
     "version": "1.0.0"
   },
   "host": "https://<api-id>.execute-api.<region>.amazonaws.com",
@@ -13,7 +13,7 @@
   "paths": {
     "/urls/{code}": {
       "get": {
-        "summary": "Returns original URL",
+        "summary": "Returns original URL by providing code",
         "parameters": [
           {
             "in": "path",
@@ -36,7 +36,7 @@
     },
     "/urls": {
       "post": {
-        "summary": "Returns shortened URL after submiting a URL",
+        "summary": "Returns unique code after submiting URL",
         "requestBody": {
           "required": true,
           "content": {

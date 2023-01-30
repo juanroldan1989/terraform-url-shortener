@@ -1,6 +1,6 @@
 # URL Shortener API
 
-1. Features
+1. Core Features
 2. API Docs
 3. CQRS Pattern
 4. HTTP Redirections
@@ -8,11 +8,48 @@
 6. API Development Life Cycle
 7. Further Improvements
 
-## Features
+## Core Features
 
-- Ability to submit URL `https://really-awesome-long-url.com` to API (POST request).
-- Receive short URL `https://short.com` in return.
-- Short URL can then be used and should redirect to original URL (GET request).
+1. Ability to submit URL `https://really-awesome-long-url.com` to API (`POST request`):
+
+```ruby
+% curl -X POST \
+-H "Content-Type: application/json" \
+-d '{"url": "https://this-is-my-original-url"}' \
+https://<api-id>.execute-api.<region>.amazonaws.com/v1/urls
+```
+
+Response:
+
+```
+736339761
+```
+
+2. Should receive `hashCode` associated with original URL. This approach allows `multiple` short-url domains to interact with this API.
+
+3. `hashCode` can then be used to build `https://<api-id>.execute-api.<region>.amazonaws.com/v1/urls/hashCode` and should return original URL `https://really-awesome-long-url.com` (`GET request`):
+
+```ruby
+% curl https://<api-id>.execute-api.<region>.amazonaws.com/v1/urls/736339761
+```
+
+Response:
+
+```
+https://this-is-my-original-url
+```
+
+**Clarification:** once a `Route53` record is configured with a custom domain name, the full production URL should look like this: `https://custom.com/hashCode`
+
+4. `HashCode` generation can be as **simple or complicated as required**. In order to create a unique hash from a specific string, it can be implemented using:
+
+   4.a. Its own `string-to-hash` converting function. It will return the hash equivalent of a string. **(approach implemented)**
+
+   4.b. `N digits` hashCode composed of `[0-9a-zA-Z]` types of characters (`62` characters in total). This represents `62^N` possibilities for IDs -> For `N = 5` -> Total amount of unique IDs: `916.132.832`. **(further development)**
+
+   4.c. Also, a library named `Crypto` can be used to generate various types of hashes like `SHA1`, `MD5`, `SHA256`, and many more. **(further development)**
+
+Reference: https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
 
 ## API Docs page
 
@@ -75,6 +112,8 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirec
 
 ## Further Improvements
 
+**New features (or improvements) that come to mind while working on core features are place on this list**
+
 - `GET /urls/{url}` path parameter can be sent as `GET /urls?url={url}` query parameter instead. Adjust `aws_api_gateway_integration` terraform resource:
 
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration
@@ -82,6 +121,12 @@ https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_
 https://aws.amazon.com/premiumsupport/knowledge-center/pass-api-gateway-rest-api-parameters/
 
 https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#input-variable-reference
+
+- `POST /urls` request could be triggered twice (or more) with the same `url` on its payload. Adjust backend to support this scenario. Create record in table for first request. Do not create another record for second request.
+
+- `GET /urls/{code}` request could be triggered many times. Consider caching implementation.
+
+- Expand on `CQRS` pattern implementation, for high number of `POST /urls` requests decouple requests by adding an `SQS Queue` instead of writing directly into DynamoDB table.
 
 - URLs shortened can be `temporal` or `permanent` ones.
 
