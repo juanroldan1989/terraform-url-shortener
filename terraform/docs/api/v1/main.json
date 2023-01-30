@@ -1,0 +1,64 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "URL Shortener API",
+    "description": "Submit URLs and get shortened URLs in return",
+    "version": "1.0.0"
+  },
+  "host": "https://<api-id>.execute-api.<region>.amazonaws.com",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/urls/{url}": {
+      "get": {
+        "summary": "Returns original URL",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "url",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "message": "https://this-is-the-original-url.com"
+          }
+        }
+      }
+    },
+    "/urls": {
+      "post": {
+        "summary": "Returns shortened URL after submiting a URL",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "message": "https://short-url.com"
+          }
+        }
+      }
+    }
+  }
+}
