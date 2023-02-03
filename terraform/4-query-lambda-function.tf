@@ -34,10 +34,6 @@ resource "aws_iam_policy" "query_lambda_function_table_access" {
           "dynamodb:GetItem",
           "dynamodb:Query",
           "dynamodb:Scan",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem"
         ]
         Effect   = "Allow"
         Resource = "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.urls.id}"

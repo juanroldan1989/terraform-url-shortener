@@ -5,6 +5,8 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/command_lambda_function/node_modules
 terraform/query_lambda_function/node_modules
+terraform/upsert_lambda_function/node_modules
 
 command_lambda_function.zip
 query_lambda_function.zip
+upsert_lambda_function.zip

@@ -5,8 +5,9 @@
 3. CQRS Pattern
 4. HTTP Redirections
 5. API Testing
-6. API Development Life Cycle
-7. Further Improvements
+6. API Rate Limiting
+7. API Development Life Cycle
+8. Further Improvements
 
 ## Core Features
 
@@ -15,8 +16,8 @@
 ```ruby
 % curl -X POST \
 -H "Content-Type: application/json" \
--d '{"url": "https://this-is-my-original-url"}' \
-https://<api-id>.execute-api.<region>.amazonaws.com/v1/urls
+-d '{"url": "https://this-is-my-sample-original-url"}' \
+https://cf20zm25j7.execute-api.us-east-1.amazonaws.com/v1/urls
 ```
 
 Response:
@@ -98,15 +99,45 @@ https://apisix.apache.org/blog/2022/09/23/build-event-driven-api/
 
 CQRS stands for `Command and Query Responsibility Segregation`, a pattern that separates reads and writes into different models, using commands to update data, and queries to read data.
 
-`query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services, each with its own storage.
+`query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services (e.g.: AWS Lambda Functions)
 
-Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes` (The write side uses a schema that is optimized for updates), while the `Query API` is implemented exclusively with `GET routes` (The read side can use a schema that is optimized for queries)
+Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes`, while the `Query API` is implemented exclusively with `GET routes`.
+
+TODO: Add diagram with 2 lambda functions
+
+### Optimization
+
+For high number of `POST` requests, an improvement is to **decouple** `command` Lambda function from `DynamoDB` table by adding an `SQS Queue` in between.
+
+`command` Lambda function **no longer writes** to `DynamoDB` table.
+
+TODO: Add diagram with 3 lambda functions
+
+This way:
+
+1. `command` Lambda function sends `url` attributes into `command` SQS Queue as message.
+2. SQS Queue message is picked up by `upsert` Lambda function.
+3. `upsert` Lambda function persists record into `urls` DynamoDB Table.
 
 ## HTTP Redirections
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirections
 
 ## API Testing
+
+## API Rate Limiting
+
+In order to avoid malicious requests (e.g.: bots) attempting to:
+
+1. Used up all possibilities for unique codes or
+
+2. Sabotage API's availability for other users.
+
+Rate Limiting is a good improvement to avoid those scenarios and can be accomplished by:
+
+1. Implementing a Captcha step within frontend app.
+
+2. Generate Free/Basic/Premium membership plans (`API Token`) within AWS API Gateway and set daily/weekly request limits for users based on membership plans.
 
 ## API Development Life Cycle
 
@@ -124,7 +155,10 @@ https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping
 
 - `POST /urls` request could be triggered twice (or more) with the same `url` on its payload. Adjust backend to support this scenario. Create record in table for first request. Do not create another record for second request.
 
-- `GET /urls/{code}` request could be triggered many times. Consider caching implementation.
+- `GET /urls/{code}` request could be triggered many times. Consider caching implementation at:
+
+  1. AWS API Gateway level or
+  2. AWS DynamoDB level (DAX)
 
 - Expand on `CQRS` pattern implementation, for high number of `POST /urls` requests decouple requests by adding an `SQS Queue` instead of writing directly into DynamoDB table.
 
@@ -138,4 +172,8 @@ https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping
 
 # URL Shortener Frontend
 
-Frontend App can be built with any frontend framework such as: Angular, React, NextJS; or even with jQuery as a static HTML page.
+Frontend App can be built with:
+
+1. Any frontend framework such as: Angular, React, NextJS.
+
+2. With jQuery as a static HTML page.

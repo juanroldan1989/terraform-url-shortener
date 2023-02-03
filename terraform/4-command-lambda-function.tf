@@ -30,11 +30,6 @@ resource "aws_iam_policy" "command_lambda_function_table_access" {
     Statement = [
       {
         Action = [
-          "dynamodb:BatchGetItem",
-          "dynamodb:GetItem",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:BatchWriteItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem"
@@ -46,9 +41,31 @@ resource "aws_iam_policy" "command_lambda_function_table_access" {
   })
 }
 
+resource "aws_iam_policy" "command_lambda_function_sqs_access" {
+  name = "SQSQueueCommandAccess"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sqs:*"
+        ]
+        Effect   = "Allow"
+        Resource = aws_sqs_queue.command_sqs_queue.arn
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "command_lambda_table_access" {
   role       = aws_iam_role.command_lambda_exec.name
   policy_arn = aws_iam_policy.command_lambda_function_table_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "command_lambda_sqs_access" {
+  role       = aws_iam_role.command_lambda_exec.name
+  policy_arn = aws_iam_policy.command_lambda_function_sqs_access.arn
 }
 
 resource "aws_lambda_function" "command_lambda_function" {
