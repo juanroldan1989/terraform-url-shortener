@@ -1,5 +1,7 @@
 # URL Shortener API
 
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/title-image.png" width="100%" />
+
 1. [Core Features](https://github.com/juanroldan1989/terraform-url-shortener#core-features)
 2. [API Documenation](https://github.com/juanroldan1989/terraform-url-shortener#api-documentation)
 3. [CQRS Pattern](https://github.com/juanroldan1989/terraform-url-shortener#cqrs-pattern)
@@ -243,6 +245,10 @@ send-notification:
         SLACK_USERNAME: Github Actions Bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 ```
+
+**CI/CD Slack Notification example:**
+
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/slack-notification-from-pipeline.png" width="100%" />
 
 # Further Improvements
 
