@@ -20,20 +20,20 @@ exports.handler = async (event, context) => {
 
   try {
     switch (casePath) {
-      case "GET /urls/{code+}":
-        console.log("event.pathParameters.code: ", event.pathParameters.code);
+    case "GET /urls/{code+}":
+      console.log("event.pathParameters.code: ", event.pathParameters.code);
 
-        params['Key'] = { 'Id' : { S: event.pathParameters.code } };
-        params['ProjectionExpression'] = 'Id, OriginalUrl';
+      params['Key'] = { 'Id' : { S: event.pathParameters.code } };
+      params['ProjectionExpression'] = 'Id, OriginalUrl';
 
-        data = await ddb.getItem(params).promise();
+      data = await ddb.getItem(params).promise();
 
-        responseBody = data.Item.OriginalUrl.S;
-        statusCode = 301; // HTTP Code - Moved Permanently
-        break;
+      responseBody = data.Item.OriginalUrl.S;
+      statusCode = 301; // HTTP Code - Moved Permanently
+      break;
 
-      default:
-        throw new Error(`Unsupported route: "${casePath}"`);
+    default:
+      throw new Error(`Unsupported route: "${casePath}"`);
     }
   } catch (err) {
     statusCode = 400;
@@ -47,4 +47,4 @@ exports.handler = async (event, context) => {
   };
 
   return response;
-}
+};
