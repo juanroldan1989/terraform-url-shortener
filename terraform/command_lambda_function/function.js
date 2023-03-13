@@ -21,54 +21,56 @@ exports.handler = async (event, context) => {
 
   try {
     switch (casePath) {
-      case "POST /urls":
-        requestJSON = JSON.parse(event.body);
-        const originalUrl = requestJSON.url;
+    case "POST /urls":
+      requestJSON = JSON.parse(event.body);
+      const originalUrl = requestJSON.url;
 
-        if (!originalUrl) {
-          throw new Error('`url` parameter is required');
-        }
+      if (!originalUrl) {
+        throw new Error('`url` parameter is required');
+      }
 
-        let hashCode = await generateHashCode(originalUrl);
-        let hashCodeString = hashCode.toString();
+      let hashCode = await generateHashCode(originalUrl);
+      let hashCodeString = hashCode.toString();
 
-        params['Item'] = { 'Id' : { S : hashCodeString } };
-        params['Item']['OriginalUrl'] = { S : originalUrl };
+      console.log("hashCodeString: ", hashCodeString);
 
-        // APPROACH 1
-        // Lambda function persists `url` record into `urls` DynamoDB Table
-        // await ddb.putItem(params).promise();
+      params['Item'] = { 'Id' : { S : hashCodeString } };
+      params['Item']['OriginalUrl'] = { S : originalUrl };
 
-        // APPROACH 2
-        // Lambda function sends `url` attributes into `command` SQS Queue as message.
-        const messageParams = {
-          MessageAttributes: {
-            Author: {
-              DataType: "String",
-              StringValue: "URL Shortener API - `command` Lambda Function",
-            }
-          },
-          MessageBody: JSON.stringify(params),
-          QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue"
-        };
+      // APPROACH 1
+      // Lambda function persists `url` record into `urls` DynamoDB Table
+      await ddb.putItem(params).promise();
 
-        console.log("SQS MESSAGE PARAMS: ", messageParams);
+      // APPROACH 2
+      // Lambda function sends `url` attributes into `command` SQS Queue as message.
+      // const messageParams = {
+      //   MessageAttributes: {
+      //     Author: {
+      //       DataType: "String",
+      //       StringValue: "URL Shortener API - `command` Lambda Function",
+      //     }
+      //   },
+      //   MessageBody: JSON.stringify(params),
+      //   QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue"
+      // };
 
-        let data = await sqsClient.sendMessage(messageParams).promise();
+      // console.log("SQS MESSAGE PARAMS: ", messageParams);
 
-        if (data) {
-          console.log("Success, message sent. MessageID: ", data.MessageId);
-        } else {
-          console.log("SQS ERROR!");
-        }
+      // let data = await sqsClient.sendMessage(messageParams).promise();
 
-        console.log("AFTER SQS SEND MESSAGE");
+      // if (data) {
+      //   console.log("Success, message sent. MessageID: ", data.MessageId);
+      // } else {
+      //   console.log("SQS ERROR!");
+      // }
 
-        responseBody = hashCodeString;
-        break;
+      // console.log("AFTER SQS SEND MESSAGE");
 
-      default:
-        throw new Error(`Unsupported route: "${casePath}"`);
+      responseBody = hashCodeString;
+      break;
+
+    default:
+      throw new Error(`Unsupported route: "${casePath}"`);
     }
   } catch (err) {
     statusCode = 400;
@@ -82,7 +84,7 @@ exports.handler = async (event, context) => {
   };
 
   return response;
-}
+};
 
 function generateHashCode(url) {
   return url.split("").reduce(function(a, b) {

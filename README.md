@@ -142,13 +142,19 @@ Testing is conducted on 3 steps within Github Actions workflow:
 
 # CI/CD (Github Actions -> Terraform -> AWS)
 
-- Deployment can be triggered from `GIT commit messages` by including `[deploy]`.
+- Deployment can be triggered from `GIT commit messages` by including `[deploy]` within a commit message.
 
-- Deployment can be triggered `manually` using Terraform CLI within `terraform` folder.
+- Deployment can be triggered `manually` by using Terraform CLI within `terraform` folder in repository:
 
-- **Pre Deployment** `linting` and `unit_tests` steps triggered through Github Actions.
+```ruby
+% cd terraform
+% terraform init
+% terraform apply
+```
 
-- **Post Deployment** `integration_tests` and `load_tests` steps triggered through Github Actions.
+- **Pre Deployment** `linting` and `unit_tests` steps are triggered by Github Actions.
+
+- **Post Deployment** `integration_tests` and `load_tests` steps are triggered by Github Actions.
 
 <img src="https://github.com/juanroldan1989/terraform-with-rest-api-gateway-and-lambda-functions/raw/main/screenshots/load-test-report.png" width="100%" />
 
