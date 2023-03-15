@@ -34,6 +34,12 @@ jobs:
           npm ci
           npx eslint function.js
 
+      - name: "[Upsert Lambda Function] Install Dependencies & Run Linters"
+        working-directory: terraform/upsert_lambda_function
+        run: |
+          npm ci
+          npx eslint function.js
+
   unit_tests:
     name: "Lambda Functions (Unit Testing)"
     runs-on: ubuntu-latest
@@ -54,6 +60,12 @@ jobs:
 
       - name: "[Query Lambda Function] Install Dependencies & Run Tests"
         working-directory: terraform/query_lambda_function
+        run: |
+          npm ci
+          npm run test tests/
+
+      - name: "[Upsert Lambda Function] Install Dependencies & Run Tests"
+        working-directory: terraform/upsert_lambda_function
         run: |
           npm ci
           npm run test tests/

@@ -11,6 +11,8 @@ exports.handler = async (event, context) => {
     TableName: 'Urls'
   };
 
+  if (event.Records.length == 0) { responseBody = '0 records provided'; };
+
   event.Records.forEach(async record => {
     const message = record.body;
     console.log('UPSERT LAMBDA FUNCTION - SQS Message received: ', message);
@@ -18,6 +20,10 @@ exports.handler = async (event, context) => {
     try {
       messageJSON = JSON.parse(message);
       console.log("MESSAGE JSON: ", messageJSON);
+
+      if (!messageJSON.Item) { throw new Error('`Item` not provided within message'); };
+      if (!messageJSON.Item.Id) { throw new Error('`Item.Id` not provided within message'); };
+      if (!messageJSON.Item.OriginalUrl) { throw new Error('`Item.OriginalUrl` not provided within message'); };
 
       params['Item'] = { 'Id' : { S : messageJSON.Item.Id.S } };
       params['Item']['OriginalUrl'] = { S : messageJSON.Item.OriginalUrl.S };
