@@ -69,3 +69,55 @@ jobs:
         run: |
           npm ci
           npm run test tests/
+
+  deployment:
+    needs: [linting, unit_tests]
+    if: "contains(github.event.head_commit.message, '[deploy]')"
+    name: "Deploy (Terraform -> AWS)"
+    runs-on: ubuntu-latest
+    outputs:
+      api_base_url: ${{steps.options.outputs.api_base_url}}
+      bucket_name: ${{steps.options.outputs.bucket_name}}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
+
+      - name: Terraform Format
+        working-directory: terraform
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate -no-color
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: terraform
+        run: terraform apply -auto-approve -input=false
+
+      - name: Set Step's Output with `api_base_url_production` value from <terraform output>
+        id: api_base_url_step
+        working-directory: terraform
+        run: |
+          api_base_url=$(terraform output -raw api_base_url_production)
+          echo $api_base_url
+          echo "::set-output name=value::${api_base_url}"
+
+      - name: Set Job's Output with `api_base_url` value
+        uses: actions/github-script@v5
+        id: options
+        with:
+          script: |
+            console.log('*** api_base_url:', '${{steps.api_base_url_step.outputs.value}}');
+            core.setOutput('api_base_url', '${{steps.api_base_url_step.outputs.value}}');

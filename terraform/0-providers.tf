@@ -1,4 +1,11 @@
 terraform {
+  cloud {
+    organization = "JUANROLDAN-training"
+
+    workspaces {
+      name = "terraform-url-shortener"
+    }
+  }
 
   required_providers {
     aws = {
@@ -15,7 +22,7 @@ terraform {
     }
   }
 
-  required_version = "~> 1.3.6"
+  required_version = "~> 1.4.0"
 }
 
 provider "aws" {
