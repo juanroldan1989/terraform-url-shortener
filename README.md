@@ -120,13 +120,59 @@ For high number of `POST` requests, an improvement is to **decouple** `command` 
 
 `command` Lambda function **no longer writes** to `DynamoDB` table.
 
-TODO: Add diagram with 3 lambda functions
-
 This way:
 
-1. `command` Lambda function sends `url` attributes into `command` SQS Queue as message.
+1. `command` Lambda function sends `url` attributes into `command` SQS Queue as message:
+
+```javascript
+// APPROACH 1
+// Lambda function persists `url` record into `urls` DynamoDB Table
+// await ddb.putItem(params).promise();
+
+// APPROACH 2
+// Lambda function sends `url` attributes into `command` SQS Queue as message.
+const messageParams = {
+  MessageAttributes: {
+    Author: {
+      DataType: "String",
+      StringValue: "URL Shortener API - `command` Lambda Function",
+    },
+  },
+  MessageBody: JSON.stringify(params),
+  QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue",
+};
+```
+
 2. SQS Queue message is picked up by `upsert` Lambda function.
-3. `upsert` Lambda function persists record into `urls` DynamoDB Table.
+3. `upsert` Lambda function persists record into `urls` DynamoDB Table:
+
+```javascript
+event.Records.forEach(async (record) => {
+  const message = record.body;
+
+  try {
+    messageJSON = JSON.parse(message);
+
+    if (!messageJSON.Item) {
+      throw new Error("`Item` not provided within message");
+    }
+    if (!messageJSON.Item.Id) {
+      throw new Error("`Item.Id` not provided within message");
+    }
+    if (!messageJSON.Item.OriginalUrl) {
+      throw new Error("`Item.OriginalUrl` not provided within message");
+    }
+
+    params["Item"] = { Id: { S: messageJSON.Item.Id.S } };
+    params["Item"]["OriginalUrl"] = { S: messageJSON.Item.OriginalUrl.S };
+
+    await ddb.putItem(params).promise();
+  } catch (err) {
+    statusCode = 400;
+    responseBody = err.message;
+  }
+});
+```
 
 # HTTP Redirections
 
@@ -136,9 +182,9 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirec
 
 Testing is conducted on 3 steps within Github Actions workflow:
 
-1. Lambda Functions (Unit testing) - [Hello Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/hello/tests/unit.test.js)
-2. API Testing (Integration) - [Welcome Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/welcome/tests/integration.test.sh)
-3. API Testing (Load) - [Welcome Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/welcome/tests/load_test.yaml)
+1. Lambda Functions (Unit testing) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/unit.test.js)
+2. API Testing (Integration) - [Command Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/command_lambda_function/tests/integration.test.sh)
+3. API Testing (Load) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/load_test.yaml)
 
 # CI/CD (Github Actions -> Terraform -> AWS)
 
@@ -211,13 +257,13 @@ Rate Limiting is a good improvement to avoid those scenarios and can be accompli
 9. Commit changes in your `feature branch` and create a `New Pull Request`.
 10. **Pre Deployment** `Github Actions` workflow will be triggered in your new branch:
 
-<img src="TODO-ADD-SCREENSHOT.png" width="100%" />
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/pre-deployment-steps.png" width="100%" />
 
 11. Validate `workflow run` results.
 12. Once everything is validated by yourself and/or colleagues, push a new commit (it could be an empty one) with the word `[deploy]`.
-13. This will trigger **pre deployment** and **post deployment** steps within the **entire github actions workflow**:
+13. This will trigger **pre deployment** and **post deployment** steps within the `Github Actions` workflow:
 
-<img src="TODO-ADD-SCREENSHOT.png" width="100%" />
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/pre-and-post-deployment-steps.png" width="100%" />
 
 14. Once everything is validated by yourself and/or colleagues, you can merge your branch into `main`.
 
