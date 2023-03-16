@@ -156,10 +156,18 @@ jobs:
       - name: Make reports directory
         run: mkdir reports
 
-      - name: Execute load tests for GET /urls endpoint
+      - name: Execute load tests for GET /urls/{code} endpoint
         env:
           TARGET: "${{ needs.deployment.outputs.api_base_url }}"
         run: /home/node/artillery/bin/run run --output reports/load_test_report_get_urls_endpoint.json terraform/query_lambda_function/tests/load_test.yaml
 
       - name: Generate HTML report for GET /urls endpoint
         run: /home/node/artillery/bin/run report --output reports/load_test_report_get_urls_endpoint.html reports/load_test_report_get_urls_endpoint.json
+
+      - name: Execute load tests for POST /urls endpoint
+        env:
+          TARGET: "${{ needs.deployment.outputs.api_base_url }}"
+        run: /home/node/artillery/bin/run run --output reports/load_test_report_post_urls_endpoint.json terraform/query_lambda_function/tests/load_test.yaml
+
+      - name: Generate HTML report for GET /urls endpoint
+        run: /home/node/artillery/bin/run report --output reports/load_test_report_post_urls_endpoint.html reports/load_test_report_post_urls_endpoint.json
