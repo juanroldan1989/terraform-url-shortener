@@ -28,6 +28,8 @@ exports.handler = async (event, context) => {
 
       data = await ddb.getItem(params).promise();
 
+      if (!data.Item) { throw new Error('`url` record not found'); };
+
       responseBody = data.Item.OriginalUrl.S;
       statusCode = 301; // HTTP Code - Moved Permanently
       break;

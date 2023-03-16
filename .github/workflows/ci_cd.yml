@@ -121,3 +121,18 @@ jobs:
           script: |
             console.log('*** api_base_url:', '${{steps.api_base_url_step.outputs.value}}');
             core.setOutput('api_base_url', '${{steps.api_base_url_step.outputs.value}}');
+
+  integration_tests:
+    needs: deployment
+    name: "API Testing (Integration)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Urls Endpoint
+        working-directory: terraform/query_lambda_function/tests
+        run: |
+          api_base_url="${{ needs.deployment.outputs.api_base_url }}"
+          echo $api_base_url
+          bash integration.test.sh $api_base_url

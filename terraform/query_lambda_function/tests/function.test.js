@@ -18,11 +18,11 @@ describe('handler - GET /unknown', () => {
 
 describe('handler - GET /urls/{code}', () => {
   test('should return error message if `code` does not match any record in `urls` table', async() => {
-    const errorMessage = "Cannot read property 'OriginalUrl' of null";
+    const errorMessage = '`url` record not found';
     const event = {
       "httpMethod" : "GET",
       "resource" : "/urls/{code+}",
-      'pathParameters' : '{ "code": "99" }'
+      'pathParameters' : '{ "code": "123456" }'
     };
 
     AWSMock.setSDKInstance(AWS);
