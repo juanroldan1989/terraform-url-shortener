@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1678959667797" clover="3.2.0">
-  <project timestamp="1678959667797" name="All files">
+<coverage generated="1678988948634" clover="3.2.0">
+  <project timestamp="1678988948634" name="All files">
     <metrics statements="25" coveredstatements="25" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1" elements="30" coveredelements="30" complexity="0" loc="25" ncloc="25" packages="1" files="1" classes="1"/>
     <file name="function.js" path="/Users/juan/code/terraform-url-shortener/terraform/query_lambda_function/function.js">
       <metrics statements="25" coveredstatements="25" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
