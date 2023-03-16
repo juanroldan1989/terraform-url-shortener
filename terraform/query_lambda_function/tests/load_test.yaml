@@ -1,0 +1,17 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  ensure:
+    p95: 550
+  phases:
+    - duration: 5 # test duration (seconds)
+      arrivalRate: 3 # requests per second
+scenarios:
+  - flow:
+      - post:
+          url: "/urls"
+          json:
+            url: "http://this-is-a-really-long-url.com"
+      - log: "Sent POST request to public endpoint `urls` with `url` attribute in payload"
+      - get:
+          url: "/urls/1957686465"
+      - log: "Sent GET request to public endpoint `urls` fetching `original_url` by `code`"
