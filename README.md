@@ -14,6 +14,8 @@
 
 # Core Features
 
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/url-shortener-infra-1.png" width="100%" />
+
 1. Ability to submit URL `https://really-awesome-long-url.com` to API (`POST request`):
 
 ```ruby
@@ -60,181 +62,6 @@ https://this-is-my-original-url
    4.c. Also, a library named `Crypto` can be used to generate various types of hashes like `SHA1`, `MD5`, `SHA256`, and many more. **(further development)**
 
 Reference: https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
-
-# API Documentation
-
-<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/swagger-api-docs.png" width="100%" />
-
-1. Swagger / OpenAPI `YAML` documentation file (format easier to read & maintain) created following standard guidelines: https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/docs/api/v1/main.yaml
-
-2. `YAML` file converted into `JSON` (since `Swagger UI` script requires a `JSON` file):
-
-```ruby
-docs/api/v1% brew install yq
-docs/api/v1% yq -o=json eval main.yml > main.json
-```
-
-3. `JSON` file can be accessed through:
-
-   3.a. `Github repository` itself as: https://raw.githubusercontent.com/github_username/terraform-url-shortener/main/docs/api/v1/main.yaml or
-
-   3.b. `S3 bucket` that will contain `main.yml`. Bucket created and file uploaded through Terraform. URL provided through `output` terraform command. [Sample Terraform Code](https://github.com/juanroldan1989/terraform-with-rest-api-gateway-and-lambda-functions/blob/main/terraform/2-rest-api-gateway-docs.tf)
-
-- Both file accessibility options available within this repository.
-
-4. `static` API Documentation `standalone` HTML page generated within `docs/api/v1` folder in repository: https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/installation.md#plain-old-htmlcssjs-standalone
-
-5. Within `static` API Documentation page, replace `url` value with your own `JSON` file's URL from point `3` above:
-
-```ruby
-...
-    <script>
-      window.onload = () => {
-        window.ui = SwaggerUIBundle({
-          // url: "https://docs-api-v1-file-url-from-point-3.com",
-          dom_id: '#swagger-ui',
-...
-```
-
-6. A `static website` can also be hosted within `S3 Bucket`: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
-
-- To upload files `aws sync` command is recommended. E.g.: `aws s3 sync docs/api/v1 s3://$YOUR_BUCKET_NAME`
-
-# CQRS Pattern
-
-Pattern implemented within REST API to handle read/write requests.
-
-https://apisix.apache.org/blog/2022/09/23/build-event-driven-api/
-
-CQRS stands for `Command and Query Responsibility Segregation`, a pattern that separates reads and writes into different models, using commands to update data, and queries to read data.
-
-`query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services (e.g.: AWS Lambda Functions)
-
-Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes`, while the `Query API` is implemented exclusively with `GET routes`.
-
-TODO: Add diagram with 2 lambda functions
-
-## Optimization Applied
-
-For high number of `POST` requests, an improvement is to **decouple** `command` Lambda function from `DynamoDB` table by adding an `SQS Queue` in between.
-
-`command` Lambda function **no longer writes** to `DynamoDB` table.
-
-This way:
-
-1. `command` Lambda function sends `url` attributes into `command` SQS Queue as message:
-
-```javascript
-// APPROACH 1
-// Lambda function persists `url` record into `urls` DynamoDB Table
-// await ddb.putItem(params).promise();
-
-// APPROACH 2
-// Lambda function sends `url` attributes into `command` SQS Queue as message.
-const messageParams = {
-  MessageAttributes: {
-    Author: {
-      DataType: "String",
-      StringValue: "URL Shortener API - `command` Lambda Function",
-    },
-  },
-  MessageBody: JSON.stringify(params),
-  QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue",
-};
-```
-
-2. SQS Queue message is picked up by `upsert` Lambda function.
-3. `upsert` Lambda function persists record into `urls` DynamoDB Table:
-
-```javascript
-event.Records.forEach(async (record) => {
-  const message = record.body;
-
-  try {
-    messageJSON = JSON.parse(message);
-
-    if (!messageJSON.Item) {
-      throw new Error("`Item` not provided within message");
-    }
-    if (!messageJSON.Item.Id) {
-      throw new Error("`Item.Id` not provided within message");
-    }
-    if (!messageJSON.Item.OriginalUrl) {
-      throw new Error("`Item.OriginalUrl` not provided within message");
-    }
-
-    params["Item"] = { Id: { S: messageJSON.Item.Id.S } };
-    params["Item"]["OriginalUrl"] = { S: messageJSON.Item.OriginalUrl.S };
-
-    await ddb.putItem(params).promise();
-  } catch (err) {
-    statusCode = 400;
-    responseBody = err.message;
-  }
-});
-```
-
-# HTTP Redirections
-
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirections
-
-# API Testing
-
-Testing is conducted on 3 steps within Github Actions workflow:
-
-1. Lambda Functions (Unit testing) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/unit.test.js)
-2. API Testing (Integration) - [Command Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/command_lambda_function/tests/integration.test.sh)
-3. API Testing (Load) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/load_test.yaml)
-
-# CI/CD (Github Actions -> Terraform -> AWS)
-
-- Deployment can be triggered from `GIT commit messages` by including `[deploy]` within a commit message.
-
-- Deployment can be triggered `manually` by using Terraform CLI within `terraform` folder in repository:
-
-```ruby
-% cd terraform
-% terraform init
-% terraform apply
-```
-
-- **Pre Deployment** `linting` and `unit_tests` steps are triggered by Github Actions.
-
-- **Post Deployment** `integration_tests` and `load_tests` steps are triggered by Github Actions.
-
-<img src="https://github.com/juanroldan1989/terraform-with-rest-api-gateway-and-lambda-functions/raw/main/screenshots/load-test-report.png" width="100%" />
-
-- Github Actions workflow can be customized here:
-
-```ruby
-# .github/workflows/ci_cd.yml
-
-name: "CI/CD Pipeline"
-
-on:
-  push:
-    paths:
-      - "terraform/**"
-      - ".github/workflows/**"
-    branches:
-      - main
-  pull_request:
-...
-```
-
-# API Rate Limiting
-
-In order to avoid malicious requests (e.g.: bots) attempting to:
-
-1. Used up all possibilities for unique codes or
-
-2. Sabotage API's availability for other users.
-
-Rate Limiting is a good improvement to avoid those scenarios and can be accomplished by:
-
-1. Implementing a Captcha step within frontend app.
-
-2. Generate Free/Basic/Premium membership plans (`API Token`) within AWS API Gateway and set daily/weekly request limits for users based on membership plans.
 
 # API Development Life Cycle
 
@@ -302,9 +129,193 @@ send-notification:
 
 <img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/slack-notification-from-pipeline.png" width="100%" />
 
+# API Testing
+
+Testing is conducted on 3 steps within Github Actions workflow:
+
+1. Lambda Functions (Unit testing) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/unit.test.js)
+2. API Testing (Integration) - [Command Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/command_lambda_function/tests/integration.test.sh)
+3. API Testing (Load) - [Query Lambda Function](https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/query_lambda_function/tests/load_test.yaml)
+
+# CI/CD (Github Actions -> Terraform -> AWS)
+
+- Deployment can be triggered from `GIT commit messages` by including `[deploy]` within a commit message.
+
+- Deployment can be triggered `manually` by using Terraform CLI within `terraform` folder in repository:
+
+```ruby
+% cd terraform
+% terraform init
+% terraform apply
+```
+
+- **Pre Deployment** `linting` and `unit_tests` steps are triggered by Github Actions.
+
+- **Post Deployment** `integration_tests` and `load_tests` steps are triggered by Github Actions.
+
+<img src="https://github.com/juanroldan1989/terraform-with-rest-api-gateway-and-lambda-functions/raw/main/screenshots/load-test-report.png" width="100%" />
+
+- Github Actions workflow can be customized here:
+
+```ruby
+# .github/workflows/ci_cd.yml
+
+name: "CI/CD Pipeline"
+
+on:
+  push:
+    paths:
+      - "terraform/**"
+      - ".github/workflows/**"
+    branches:
+      - main
+  pull_request:
+...
+```
+
+# API Documentation
+
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/swagger-api-docs.png" width="100%" />
+
+1. Swagger / OpenAPI `YAML` documentation file (format easier to read & maintain) created following standard guidelines: https://github.com/juanroldan1989/terraform-url-shortener/blob/main/terraform/docs/api/v1/main.yaml
+
+2. `YAML` file converted into `JSON` (since `Swagger UI` script requires a `JSON` file):
+
+```ruby
+docs/api/v1% brew install yq
+docs/api/v1% yq -o=json eval main.yml > main.json
+```
+
+3. `JSON` file can be accessed through:
+
+   3.a. `Github repository` itself as: https://raw.githubusercontent.com/github_username/terraform-url-shortener/main/docs/api/v1/main.yaml or
+
+   3.b. `S3 bucket` that will contain `main.yml`. Bucket created and file uploaded through Terraform. URL provided through `output` terraform command. [Sample Terraform Code](https://github.com/juanroldan1989/terraform-with-rest-api-gateway-and-lambda-functions/blob/main/terraform/2-rest-api-gateway-docs.tf)
+
+- Both file accessibility options available within this repository.
+
+4. `static` API Documentation `standalone` HTML page generated within `docs/api/v1` folder in repository: https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/installation.md#plain-old-htmlcssjs-standalone
+
+5. Within `static` API Documentation page, replace `url` value with your own `JSON` file's URL from point `3` above:
+
+```ruby
+...
+    <script>
+      window.onload = () => {
+        window.ui = SwaggerUIBundle({
+          // url: "https://docs-api-v1-file-url-from-point-3.com",
+          dom_id: '#swagger-ui',
+...
+```
+
+6. A `static website` can also be hosted within `S3 Bucket`: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
+
+- To upload files `aws sync` command is recommended. E.g.: `aws s3 sync docs/api/v1 s3://$YOUR_BUCKET_NAME`
+
+# CQRS Pattern
+
+Pattern implemented within REST API to handle read/write requests.
+
+https://apisix.apache.org/blog/2022/09/23/build-event-driven-api/
+
+CQRS stands for `Command and Query Responsibility Segregation`, a pattern that separates reads and writes into different models, using commands to update data, and queries to read data.
+
+`query` and `upsert` (updates or creates) responsibilities are split (segregated) into different services (e.g.: AWS Lambda Functions)
+
+Technically, this can be implemented in HTTP so that the `Command API` is implemented exclusively with `POST routes`, while the `Query API` is implemented exclusively with `GET routes`.
+
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/url-shortener-infra-2.png" width="100%" />
+
+For high number of `POST` requests, an improvement is to **decouple** `command` Lambda function from `DynamoDB` table by adding an `SQS Queue` in between.
+
+`command` Lambda function **no longer writes** to `DynamoDB` table.
+
+This way:
+
+1. `command` Lambda function sends `url` attributes into `command` SQS Queue as message:
+
+```javascript
+// APPROACH 1
+// Lambda function persists `url` record into `urls` DynamoDB Table
+// await ddb.putItem(params).promise();
+
+// APPROACH 2
+// Lambda function sends `url` attributes into `command` SQS Queue as message.
+const messageParams = {
+  MessageAttributes: {
+    Author: {
+      DataType: "String",
+      StringValue: "URL Shortener API - `command` Lambda Function",
+    },
+  },
+  MessageBody: JSON.stringify(params),
+  QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue",
+};
+```
+
+2. SQS Queue message is picked up by `upsert` Lambda function.
+3. `upsert` Lambda function persists record into `urls` DynamoDB Table:
+
+```javascript
+event.Records.forEach(async (record) => {
+  const message = record.body;
+
+  try {
+    messageJSON = JSON.parse(message);
+
+    if (!messageJSON.Item) {
+      throw new Error("`Item` not provided within message");
+    }
+    if (!messageJSON.Item.Id) {
+      throw new Error("`Item.Id` not provided within message");
+    }
+    if (!messageJSON.Item.OriginalUrl) {
+      throw new Error("`Item.OriginalUrl` not provided within message");
+    }
+
+    params["Item"] = { Id: { S: messageJSON.Item.Id.S } };
+    params["Item"]["OriginalUrl"] = { S: messageJSON.Item.OriginalUrl.S };
+
+    await ddb.putItem(params).promise();
+  } catch (err) {
+    statusCode = 400;
+    responseBody = err.message;
+  }
+});
+```
+
+# AWS Infrastructure Design (Improvement)
+
+This set of improvements include services like:
+
+AWS Route 53 (DNS), AWS CloudFront and S3 (storing and distributing static content: HTML/CSS/JS) and AWS Cognito (Authentication).
+
+AWS ElastiCache is also posible to implement for READ operations within AWS Query Lambda function.
+
+<img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/url-shortener-infra-3.png" width="100%" />
+
 # Further Improvements
 
 **New features (or improvements) that come to mind while working on core features are placed on this list**
+
+- **API Rate Limiting**
+
+In order to avoid malicious requests (e.g.: bots) attempting to:
+
+1. Used up all possibilities for unique codes or
+
+2. Sabotage API's availability for other users.
+
+Rate Limiting is a good improvement to avoid those scenarios and can be accomplished by:
+
+1. Implementing a Captcha step within frontend app.
+
+2. Generate Free/Basic/Premium membership plans (`API Token`) within AWS API Gateway and set daily/weekly request limits for users based on membership plans.
+
+- **HTTP Redirections**
+When returning an existing URL, we should return a 302 HTTP code for future client's request:
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirections
 
 - **Infrastructure code** refactoring:
 
