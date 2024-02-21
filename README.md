@@ -2,15 +2,13 @@
 
 <img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/title-image.png" width="100%" />
 
-1. [Core Features](https://github.com/juanroldan1989/terraform-url-shortener#core-features)
-2. [API Documenation](https://github.com/juanroldan1989/terraform-url-shortener#api-documentation)
-3. [CQRS Pattern](https://github.com/juanroldan1989/terraform-url-shortener#cqrs-pattern)
-4. [HTTP Redirections](https://github.com/juanroldan1989/terraform-url-shortener#http-redirections)
-5. [API Testing](https://github.com/juanroldan1989/terraform-url-shortener#api-testing)
-6. [CI/CD (Github Actions -> Terraform -> AWS)](https://github.com/juanroldan1989/terraform-url-shortener#cicd-github-actions---terraform---aws)
-7. [API Rate Limiting](https://github.com/juanroldan1989/terraform-url-shortener#api-rate-limiting)
-8. [API Development Life Cycle](https://github.com/juanroldan1989/terraform-url-shortener#api-development-life-cycle)
-9. [Further Improvements](https://github.com/juanroldan1989/terraform-url-shortener#further-improvements)
+1. [Core Features](#core-features)
+2. [API Development Life Cycle](#api-development-life-cycle)
+3. [API Testing](#api-testing)
+4. [API Documenation](#api-documentation)
+5. [CQRS Pattern](#cqrs-pattern)
+6. [AWS Infrastructure Design (Improvement)](#aws-infrastructure-design-improvement)
+7. [Further Improvements](#further-improvements)
 
 # Core Features
 
