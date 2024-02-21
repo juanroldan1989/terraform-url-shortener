@@ -39,32 +39,32 @@ exports.handler = async (event, context) => {
 
       // APPROACH 1
       // Lambda function persists `url` record into `urls` DynamoDB Table
-      await ddb.putItem(params).promise();
+      // await ddb.putItem(params).promise();
 
       // APPROACH 2
       // Lambda function sends `url` attributes into `command` SQS Queue as message.
-      // const messageParams = {
-      //   MessageAttributes: {
-      //     Author: {
-      //       DataType: "String",
-      //       StringValue: "URL Shortener API - `command` Lambda Function",
-      //     }
-      //   },
-      //   MessageBody: JSON.stringify(params),
-      //   QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue"
-      // };
+      const messageParams = {
+        MessageAttributes: {
+          Author: {
+            DataType: "String",
+            StringValue: "URL Shortener API - `command` Lambda Function",
+          }
+        },
+        MessageBody: JSON.stringify(params),
+        QueueUrl: "https://sqs.us-east-1.amazonaws.com/542979624611/command-sqs-queue"
+      };
 
-      // console.log("SQS MESSAGE PARAMS: ", messageParams);
+      console.log("SQS MESSAGE PARAMS: ", messageParams);
 
-      // let data = await sqsClient.sendMessage(messageParams).promise();
+      let data = await sqsClient.sendMessage(messageParams).promise();
 
-      // if (data) {
-      //   console.log("Success, message sent. MessageID: ", data.MessageId);
-      // } else {
-      //   console.log("SQS ERROR!");
-      // }
+      if (data) {
+        console.log("Success, message sent. MessageID: ", data.MessageId);
+      } else {
+        console.log("SQS ERROR!");
+      }
 
-      // console.log("AFTER SQS SEND MESSAGE");
+      console.log("AFTER SQS SEND MESSAGE");
 
       responseBody = hashCodeString;
       break;
