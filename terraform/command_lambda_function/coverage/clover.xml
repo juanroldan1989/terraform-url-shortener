@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1678988993850" clover="3.2.0">
-  <project timestamp="1678988993850" name="All files">
-    <metrics statements="33" coveredstatements="33" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3" elements="40" coveredelements="40" complexity="0" loc="33" ncloc="33" packages="1" files="1" classes="1"/>
+<coverage generated="1708635099498" clover="3.2.0">
+  <project timestamp="1708635099498" name="All files">
+    <metrics statements="35" coveredstatements="35" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3" elements="42" coveredelements="42" complexity="0" loc="35" ncloc="35" packages="1" files="1" classes="1"/>
     <file name="function.js" path="/Users/juan/code/terraform-url-shortener/terraform/command_lambda_function/function.js">
-      <metrics statements="33" coveredstatements="33" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3"/>
+      <metrics statements="35" coveredstatements="35" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
       <line num="4" count="1" type="stmt"/>
-      <line num="5" count="3" type="stmt"/>
-      <line num="6" count="3" type="stmt"/>
-      <line num="8" count="3" type="stmt"/>
-      <line num="9" count="3" type="stmt"/>
-      <line num="10" count="3" type="stmt"/>
-      <line num="13" count="3" type="stmt"/>
-      <line num="14" count="3" type="stmt"/>
-      <line num="18" count="3" type="stmt"/>
-      <line num="22" count="3" type="stmt"/>
-      <line num="23" count="3" type="cond" truecount="2" falsecount="0"/>
-      <line num="25" count="2" type="stmt"/>
-      <line num="26" count="2" type="stmt"/>
-      <line num="28" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="5" count="5" type="stmt"/>
+      <line num="6" count="5" type="stmt"/>
+      <line num="8" count="5" type="stmt"/>
+      <line num="9" count="5" type="stmt"/>
+      <line num="10" count="5" type="stmt"/>
+      <line num="13" count="5" type="stmt"/>
+      <line num="14" count="5" type="stmt"/>
+      <line num="18" count="5" type="stmt"/>
+      <line num="22" count="5" type="stmt"/>
+      <line num="23" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="25" count="4" type="stmt"/>
+      <line num="26" count="4" type="stmt"/>
+      <line num="28" count="4" type="cond" truecount="2" falsecount="0"/>
       <line num="29" count="1" type="stmt"/>
-      <line num="32" count="1" type="stmt"/>
-      <line num="33" count="1" type="stmt"/>
-      <line num="35" count="1" type="stmt"/>
-      <line num="37" count="1" type="stmt"/>
-      <line num="38" count="1" type="stmt"/>
-      <line num="42" count="1" type="stmt"/>
-      <line num="69" count="1" type="stmt"/>
-      <line num="70" count="1" type="stmt"/>
-      <line num="73" count="1" type="stmt"/>
-      <line num="76" count="2" type="stmt"/>
-      <line num="77" count="2" type="stmt"/>
-      <line num="80" count="3" type="stmt"/>
-      <line num="86" count="3" type="stmt"/>
-      <line num="90" count="1" type="stmt"/>
-      <line num="91" count="44" type="stmt"/>
-      <line num="92" count="44" type="stmt"/>
+      <line num="32" count="3" type="stmt"/>
+      <line num="33" count="3" type="stmt"/>
+      <line num="35" count="3" type="stmt"/>
+      <line num="37" count="3" type="stmt"/>
+      <line num="38" count="3" type="stmt"/>
+      <line num="46" count="3" type="stmt"/>
+      <line num="57" count="3" type="stmt"/>
+      <line num="58" count="3" type="stmt"/>
+      <line num="60" count="2" type="stmt"/>
+      <line num="61" count="2" type="stmt"/>
+      <line num="64" count="1" type="stmt"/>
+      <line num="67" count="3" type="stmt"/>
+      <line num="68" count="3" type="stmt"/>
+      <line num="71" count="5" type="stmt"/>
+      <line num="77" count="5" type="stmt"/>
+      <line num="81" count="3" type="stmt"/>
+      <line num="82" count="132" type="stmt"/>
+      <line num="83" count="132" type="stmt"/>
     </file>
   </project>
 </coverage>

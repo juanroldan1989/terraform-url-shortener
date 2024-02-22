@@ -51,20 +51,11 @@ exports.handler = async (event, context) => {
           }
         },
         MessageBody: JSON.stringify(params),
-        QueueUrl: "https://sqs.us-east-1.amazonaws.com/542979624611/command-sqs-queue"
+        QueueUrl: "https://sqs.<region>.amazonaws.com/<account-id>/command-sqs-queue"
       };
 
       console.log("SQS MESSAGE PARAMS: ", messageParams);
-
-      let data = await sqsClient.sendMessage(messageParams).promise();
-
-      if (data) {
-        console.log("Success, message sent. MessageID: ", data.MessageId);
-      } else {
-        console.log("SQS ERROR!");
-      }
-
-      console.log("AFTER SQS SEND MESSAGE");
+      await sqsClient.sendMessage(messageParams).promise();
 
       responseBody = hashCodeString;
       break;

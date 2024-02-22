@@ -42,6 +42,9 @@ describe('handler - POST /urls', () => {
     AWSMock.mock('DynamoDB', 'putItem', (params, callback) => {
       return callback(false, { Item: null });
     });
+    AWSMock.mock('SQS', 'sendMessage', (params, callback) => {
+      return callback(false, { MessageId: '123' });
+    });
 
     const response = await handler(event);
 
@@ -50,5 +53,46 @@ describe('handler - POST /urls', () => {
 
     AWSMock.restore('DynamoDB');
     AWSMock.restore('DynamoDB.putItem');
+  });
+
+  test('should return 200 code on successful enqueue message into `command` SQS Queue ', async () => {
+    const event = {
+      "httpMethod" : "POST",
+      "resource" : "/urls",
+      'body' : '{ "url" : "https://this-is-a-really-really-long-url.com" }'
+    };
+
+    AWSMock.setSDKInstance(AWS);
+    AWSMock.mock('SQS', 'sendMessage', (params, callback) => {
+      return callback(false, { MessageId: '123' });
+    });
+
+    const response = await handler(event);
+
+    expect(response.body).toEqual('-674951488');
+    expect(response.statusCode).toEqual(200);
+
+    AWSMock.restore('SQS');
+    AWSMock.restore('SQS.sendMessage');
+  });
+
+  test('should return 400 code on unsuccessful enqueue message into `command` SQS Queue ', async () => {
+    const event = {
+      "httpMethod" : "POST",
+      "resource" : "/urls",
+      'body' : '{ "url" : "https://this-is-a-really-really-long-url.com" }'
+    };
+
+    AWSMock.setSDKInstance(AWS);
+    AWSMock.mock('SQS', 'sendMessage', (params, callback) => {
+      return callback({});
+    });
+
+    const response = await handler(event);
+
+    expect(response.statusCode).toEqual(400);
+
+    AWSMock.restore('SQS');
+    AWSMock.restore('SQS.sendMessage');
   });
 });
