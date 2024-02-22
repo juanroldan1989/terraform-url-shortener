@@ -59,7 +59,9 @@ resource "aws_iam_policy" "upsert_lambda_function_table_access" {
     Statement = [
       {
         Action = [
-          "dynamodb:*"
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
         ]
         Effect   = "Allow"
         Resource = "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.urls.id}"
