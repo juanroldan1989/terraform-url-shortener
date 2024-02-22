@@ -65,7 +65,7 @@ describe('handler', () => {
   test('should return success message if 1 `Record` is provided with `Item` data', async() => {
     const event = {
       "Records" : [
-        { "body" : '{ "Item" : { "Id" : "1234567", "OriginalUrl" : "https://this-is-a-long-url.com" } }' }
+        { "body" : "{\"TableName\":\"Urls\",\"Item\":{\"Id\":{\"S\":\"1150561781\"},\"OriginalUrl\":{\"S\":\"https://some-sample-and-long-url-MAYBE-GOOD.com\"}}}" }
       ],
     };
     const item = {
@@ -74,12 +74,39 @@ describe('handler', () => {
     };
 
     AWSMock.setSDKInstance(AWS);
-    AWSMock.mock('DynamoDB', 'putItem', (params, callback) => {
-      return callback(false, { Item: item });
+    AWSMock.mock('DynamoDB', 'putItem', (callback) => {
+      return callback(true, { Item: item });
     });
 
     const response = await handler(event);
 
     expect(response.statusCode).toEqual(200);
+
+    AWSMock.restore('DynamoDB');
+    AWSMock.restore('DynamoDB.putItem');
+  });
+
+  test('should return error message if 1 `Record` is provided with `Item` data and cannot be persisted', async() => {
+    const event = {
+      "Records" : [
+        { "body" : "{\"Item\":{\"Id\":{\"S\":\"1150561781\"},\"OriginalUrl\":{\"S\":\"https://some-sample-and-long-url-MAYBE-GOOD.com\"}}}" }
+      ],
+    };
+    const item = {
+      "Id" : { "S" : "1234567" },
+      "OriginalUrl" : { "S" : "https://this-is-a-long-url.com" }
+    };
+
+    AWSMock.setSDKInstance(AWS);
+    AWSMock.mock('DynamoDB', 'putItem', (callback) => {
+      return callback(true, { Item: item });
+    });
+
+    const response = await handler(event);
+
+    expect(response.statusCode).toEqual(400);
+
+    AWSMock.restore('DynamoDB');
+    AWSMock.restore('DynamoDB.putItem');
   });
 });

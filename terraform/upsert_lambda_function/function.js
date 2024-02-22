@@ -14,23 +14,29 @@ exports.handler = (event) => {
     let message = record.body;
     console.log('UPSERT LAMBDA FUNCTION - SQS Message received: ', message);
 
-    messageJSON = JSON.parse(message);
-    console.log("MESSAGE JSON: ", messageJSON);
+    try {
+      messageJSON = JSON.parse(message);
+      console.log("MESSAGE JSON: ", messageJSON);
 
-    if (!messageJSON.Item) { throw new Error('`Item` not provided within message'); };
-    if (!messageJSON.Item.Id) { throw new Error('`Item.Id` not provided within message'); };
-    if (!messageJSON.Item.OriginalUrl) { throw new Error('`Item.OriginalUrl` not provided within message'); };
+      if (!messageJSON.Item) { throw new Error('`Item` not provided within message'); };
+      if (!messageJSON.Item.Id) { throw new Error('`Item.Id` not provided within message'); };
+      if (!messageJSON.Item.OriginalUrl) { throw new Error('`Item.OriginalUrl` not provided within message'); };
 
-    ddb.putItem(messageJSON, function(err, data) {
-      if (err) {
-        console.log("UPSERT ERROR: ", err.message);
-        statusCode = 400;
-        responseBody = err.message;
-      } else {
-        console.log("UPSERT SUCCESS: ", data);
-        responseBody = data;
-      }
-    });
+      ddb.putItem(messageJSON, function(err, data) {
+        if (err) {
+          console.log("UPSERT ERROR: ", err.message);
+          statusCode = 400;
+          responseBody = err.message;
+        } else {
+          console.log("UPSERT SUCCESS: ", data);
+          responseBody = data;
+        }
+      });
+    } catch (err) {
+      console.log("UPSERT ERROR: ", err.message);
+      statusCode = 400;
+      responseBody = err.message;
+    }
   });
 
   const response = {
