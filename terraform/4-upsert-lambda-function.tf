@@ -86,6 +86,8 @@ resource "aws_lambda_function" "upsert_lambda_function" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.upsert_lambda_function.key
 
+  # TODO: adjust to NodeJS 18.x to import ONLY the modules from AWS SDK needed for the Lambda Function
+  # https://github.com/aws/aws-sdk-js/issues/4401
   runtime = "nodejs16.x"
   handler = "function.handler"
 
