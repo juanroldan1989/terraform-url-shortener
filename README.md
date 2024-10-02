@@ -2,13 +2,29 @@
 
 <img src="https://github.com/juanroldan1989/terraform-url-shortener/raw/main/screenshots/title-image.png" width="100%" />
 
-1. [Core Features](#core-features)
-2. [API Development Life Cycle](#api-development-life-cycle)
-3. [API Testing](#api-testing)
-4. [API Documenation](#api-documentation)
-5. [CQRS Pattern](#cqrs-pattern)
-6. [AWS Infrastructure Design (Improvement)](#aws-infrastructure-design-improvement)
-7. [Further Improvements](#further-improvements)
+<h4 align="center">URL Shortener API | CQRS Pattern | Infrastructure by Terraform </h4>
+
+<p align="center">
+  <a href="https://github.com/juanroldan1989/terraform-url-shortener/commits/main">
+  <img src="https://img.shields.io/github/last-commit/juanroldan1989/terraform-url-shortener.svg?style=flat-square&logo=github&logoColor=white" alt="GitHub last commit">
+  <a href="https://github.com/juanroldan1989/terraform-url-shortener/issues">
+  <img src="https://img.shields.io/github/issues-raw/juanroldan1989/terraform-url-shortener.svg?style=flat-square&logo=github&logoColor=white" alt="GitHub issues">
+  <a href="https://github.com/juanroldan1989/terraform-url-shortener/pulls">
+  <img src="https://img.shields.io/github/issues-pr-raw/juanroldan1989/terraform-url-shortener.svg?style=flat-square&logo=github&logoColor=white" alt="GitHub pull requests">
+  <a href="https://github.com/juanroldan1989/terraform-url-shortener/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#core-features">Core Features</a> •
+  <a href="#api-development-life-cycle">API Development Life cycle</a> •
+  <a href="#api-testing">API Testing</a> •
+  <a href="#api-documentation">API Documentation</a> •
+  <a href="#cqrs-pattern">CQRS Pattern</a> •
+  <a href="#further_improvements">Further Improvements</a> •
+  <a href="#contribute">Contribute</a>
+</p>
 
 # Core Features
 
@@ -311,7 +327,7 @@ Rate Limiting is a good improvement to avoid those scenarios and can be accompli
 2. Generate Free/Basic/Premium membership plans (`API Token`) within AWS API Gateway and set daily/weekly request limits for users based on membership plans.
 
 - **HTTP Redirections**
-When returning an existing URL, we should return a 302 HTTP code for future client's request:
+  When returning an existing URL, we should return a 302 HTTP code for future client's request:
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#permanent_redirections
 
@@ -358,10 +374,20 @@ https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping
 
 5. associating a `long URL` with a `hashCode` during `POST /urls` requests workflow.
 
-# URL Shortener Frontend
+## URL Shortener Frontend
 
 Frontend App can be built with:
 
 1. Any frontend framework such as: Angular, React, NextJS.
 
 2. With jQuery as a static HTML page.
+
+# Contribute
+
+Got **something interesting** you'd like to **add or change**? Please feel free to [Open a Pull Request](https://github.com/juanroldan1989/terraform-url-shortener/pulls)
+
+If you want to say **thank you** and/or support the active development of `Terraform URL Shortener`:
+
+1. Add a [GitHub Star](https://github.com/juanroldan1989/terraform-url-shortener/stargazers) to the project.
+2. Tweet about the project [on your Twitter](https://twitter.com/intent/tweet?text=Hey%20I've%20just%20discovered%20this%20cool%20app%20on%20Github%20by%20@JhonnyDaNiro%20-%20URLShortener%20API%20Terraform&url=https://github.com/juanroldan1989/terraform-url-shortener/&via=Github).
+3. Write a review or tutorial on [Medium](https://medium.com), [Dev.to](https://dev.to) or personal blog.
